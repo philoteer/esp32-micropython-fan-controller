@@ -68,7 +68,7 @@ def tacho_handler(pin):
     timestamp = time.ticks_ms()
     if(timestamp > tacho_cnt_start + 1000 or timestamp < tacho_cnt_start):
         tacho_cnt_start = timestamp
-        tacho_rpm_est = tacho_cnt * 30
+        tacho_rpm_est = tacho_cnt * 30 #two falling edges per a cycle
         tacho_cnt = 0
 
 tacho_pin.irq(trigger=machine.Pin.IRQ_FALLING, handler=tacho_handler)
