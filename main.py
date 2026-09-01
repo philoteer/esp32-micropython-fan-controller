@@ -81,10 +81,13 @@ tacho_pin.irq(trigger=machine.Pin.IRQ_FALLING, handler=tacho_handler)
 #####################################################
 #print("Entering Main loop")
 while True:
-    display.fill(0)
-    display.text('PWM Duty:' + str(pwm_duty) + "%", 0, 0)
-    display.text('RPM:' + str(tacho_rpm_est) , 0, 10)
-    #display.text('_'+ str(tacho_ADC.read_uv()),0,10)
-    display.show()
-    time.sleep(0.1)
+    try:
+        display.fill(0)
+        display.text('PWM Duty:' + str(pwm_duty) + "%", 0, 0)
+        display.text('RPM:' + str(tacho_rpm_est) , 0, 10)
+        #display.text('_'+ str(tacho_ADC.read_uv()),0,10)
+        display.show()
+        time.sleep(0.1)
+    except:
+        time.sleep(0.1)
 #####################################################
