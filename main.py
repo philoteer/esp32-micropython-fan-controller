@@ -19,8 +19,26 @@ tacho_pin = machine.Pin(0, machine.Pin.IN)
 ### Hardware, variables Init
 #####################################################
 # Display
-i2c = machine.I2C(sda=i2c_sda, scl=i2c_scl)
-display = ssd1306.SSD1306_I2C(128, 64, i2c)
+def create_display():
+    new_i2c = machine.I2C(sda=i2c_sda, scl=i2c_scl, freq=100000)
+    try:
+        new_display = ssd1306.SSD1306_I2C(128, 64, new_i2c)
+    except OSError:
+        try:
+            new_i2c.deinit()
+        except (AttributeError, OSError):
+            pass
+        raise
+    return new_i2c, new_display
+
+
+while True:
+    try:
+        i2c, display = create_display()
+        break
+    except OSError as error:
+        print("Display initialization failed:", error)
+        time.sleep(0.1)
 
 # PWM-related
 last_timestamp = time.ticks_ms()
@@ -87,7 +105,17 @@ while True:
         display.text('RPM:' + str(tacho_rpm_est) , 0, 10)
         #display.text('_'+ str(tacho_ADC.read_uv()),0,10)
         display.show()
-        time.sleep(0.1)
-    except:
-        time.sleep(0.1)
+    except OSError as error:
+        print("Display I2C error:", error)
+        try:
+            i2c.deinit()
+        except (AttributeError, OSError):
+            pass
+
+        time.sleep_ms(10)
+        try:
+            i2c, display = create_display()
+        except OSError as recovery_error:
+            print("Display recovery failed:", recovery_error)
+    time.sleep(0.1)
 #####################################################
